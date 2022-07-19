@@ -200,18 +200,21 @@ public class OrderRepository {
 	/**
 	 * 注文一覧を検索する.
 	 * 
-	 * @param type 商品タイプ
+	 * @param type   商品タイプ
+	 * @param userId ユーザID
 	 * @return 注文一覧
 	 */
-	public List<Order> findAllFullOrderByType(String type) {
+	public List<Order> findAllFullOrderByType(String type, int userId) {
 		String sql = "SELECT" + ORDER_SELECT + "," + ORDER_ITEMS_SELECT + "," + ITEMS_SELECT + ","
 				+ ORDER_TOPPINGS_SELECT + "," + TOPPINGS_SELECT + " FROM " + TABLE_ORDER_WITH_ALIAS
 				+ " LEFT OUTER JOIN " + TABLE_ORDER_ITEMS_WITH_ALIAS + " ON o.id=oi.order_id " + "LEFT OUTER JOIN "
 				+ TABLE_ITEMS_WITH_ALIAS + " ON i.id=oi.item_id " + "LEFT OUTER JOIN " + TABLE_ORDER_TOPPINGS_WITH_ARIAS
 				+ "  ON oi.id=ot.order_item_id " + "LEFT OUTER JOIN " + TABLE_TOPPINGS_WITH_ARIAS
-				+ " ON t.id=ot.topping_id " + " WHERE i.type=:type;";
+				+ " ON t.id=ot.topping_id " + " WHERE i.type=:type and o.user_id=:userId;";
 //				+ " ORDER BY o.id,oi.id,ot.id;";
-		SqlParameterSource param = new MapSqlParameterSource().addValue("type", type);
+		System.out.println(sql);
+		System.out.println("type:" + type + "/userId:" + userId);
+		SqlParameterSource param = new MapSqlParameterSource().addValue("type", type).addValue("userId", userId);
 		List<Order> orderList = template.query(sql, param, ORDER_RESULT_SET_EXTRACTOR);
 		return orderList;
 	}

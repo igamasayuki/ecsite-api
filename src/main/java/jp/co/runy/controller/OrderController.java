@@ -34,19 +34,19 @@ public class OrderController {
 	@Autowired
 	private OrderService orderService;
 
-	
 	/**
 	 * 注文一覧情報を取得します.
 	 *
 	 * <pre>
-	 * curl -X GET -H "Content-Type: application/json" "http://localhost:8080/ecsite-api/order/orders"
+	 * curl -X GET -H "Content-Type: application/json" "http://localhost:8080/ecsite-api/order/orders/ahloha/1111"
 	 * </pre>
+	 * 
 	 * @return 全件検索結果
 	 */
-	@RequestMapping(value = "/orders/{type}", method = RequestMethod.GET)
-	public Map<String, Object> orders(@PathVariable("type") String type) {
+	@RequestMapping(value = "/orders/{type}/{userId}", method = RequestMethod.GET)
+	public Map<String, Object> orders(@PathVariable("type") String type, @PathVariable("userId") String userId) {
 
-		List<Order> orders = orderService.getAllFullOrderByType(type);
+		List<Order> orders = orderService.getAllFullOrderByType(type, Integer.parseInt(userId));
 
 		Map<String, Object> ordersMap = new HashMap<>();
 		ordersMap.put("totalOrderCount", orders.size());
@@ -55,8 +55,7 @@ public class OrderController {
 		System.out.println("orders : " + ordersMap);
 		return ordersMap;
 	}
-	
-	
+
 	/**
 	 * 注文情報を新規登録する.
 	 * 
@@ -67,7 +66,7 @@ public class OrderController {
 	@RequestMapping(value = "", method = RequestMethod.POST)
 	public WebApiResponseMessage order(@RequestBody @Validated OrderForm orderForm, BindingResult result) {
 		System.out.println("OrderForm:" + orderForm);
-		
+
 		WebApiResponseMessage webApiResponseMessageDomain = new WebApiResponseMessage();
 
 		try {

@@ -1,13 +1,12 @@
 package jp.co.runy.form;
 
-import java.util.Date;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
 
 /**
  * 注文時の各種情報を取得する際に使用するフォーム.
@@ -42,7 +41,7 @@ public class OrderForm {
 
 	/** 送り先郵便番号 */
 	@NotBlank(message = "郵便番号を入力して下さい")
-	@Pattern(regexp = "^([0-9]{3}-[0-9]{4})?$", message = "郵便番号はXXX-XXXXの形式で入力してください")
+//	@Pattern(regexp = "^([0-9]{3}-[0-9]{4})?$", message = "郵便番号はXXX-XXXXの形式で入力してください")
 	private String destinationZipcode;
 
 	/** 送り先住所 */
@@ -51,7 +50,7 @@ public class OrderForm {
 
 	/** 送り先電話番号 */
 	@NotBlank(message = "電話番号を入力して下さい")
-	@Pattern(regexp = "^(\\d{1,4}-\\d{1,4}-\\d{1,4})?$", message = "電話番号はXXXX-XXXX-XXXXの形式で入力してください")
+//	@Pattern(regexp = "^(\\d{1,4}-\\d{1,4}-\\d{1,4})?$", message = "電話番号はXXXX-XXXX-XXXXの形式で入力してください")
 	private String destinationTel;
 
 //	/** 配達希望日程 */

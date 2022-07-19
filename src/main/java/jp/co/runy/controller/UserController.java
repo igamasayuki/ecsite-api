@@ -118,6 +118,28 @@ public class UserController {
 	public WebApiResponseObject login(@RequestBody LoginForm form, BindingResult result, Model model) {
 		System.out.println("form:" + form);
 		WebApiResponseObject webApiResponseObject = new WebApiResponseObject();
+		Map<String,Object> responseMap = new HashMap<>();
+		
+		if("admin@xxx.com".equals(form.getEmail()) && "adminadmin".equals(form.getPassword())) {
+			// 管理者ユーザーの情報なら管理者情報(isAdmin==trueの情報)を返す
+			User user = new User();
+			user.setId(999999999);
+			user.setName("管理者ユーザー");
+			user.setEmail("admin@xxx.com");
+			user.setPassword("**********");
+			user.setZipcode("2208136");
+			user.setAddress("東京都新宿区1-1-1");
+			user.setTelephone("090-0000-0000");
+			user.setAdmin(true);
+			// 成功情報をレスポンス
+			webApiResponseObject.setStatus("success");
+			webApiResponseObject.setMessage("OK.");
+			webApiResponseObject.setErrorCode("E-00");
+			responseMap.put("user", user);
+			webApiResponseObject.setResponseMap(responseMap);
+			System.out.println(webApiResponseObject);
+			return webApiResponseObject;
+		}
 
 		User user = loginService.login(form.getEmail(), form.getPassword());
 
@@ -136,7 +158,6 @@ public class UserController {
 		webApiResponseObject.setStatus("success");
 		webApiResponseObject.setMessage("OK.");
 		webApiResponseObject.setErrorCode("E-00");
-		Map<String,Object> responseMap = new HashMap<>();
 		responseMap.put("user", user);
 		webApiResponseObject.setResponseMap(responseMap);
 		System.out.println(webApiResponseObject);

@@ -21,6 +21,9 @@ public class User {
 	private String address;
 	/** 電話番号 */
 	private String telephone;
+	
+	/** 管理者フラグ(FRのみ利用:DBにはありません) */
+	private boolean isAdmin;
 
 	@Override
 	public String toString() {
@@ -82,5 +85,13 @@ public class User {
 
 	public void setTelephone(String telephone) {
 		this.telephone = telephone;
+	}
+	
+	public boolean isAdmin() {
+		return isAdmin;
+	}
+
+	public void setAdmin(boolean isAdmin) {
+		this.isAdmin = isAdmin;
 	}
 }

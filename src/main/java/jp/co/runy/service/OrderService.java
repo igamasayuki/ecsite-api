@@ -40,11 +40,12 @@ public class OrderService {
 	/**
 	 * 注文一覧を検索する.
 	 * 
-	 * @param type 商品タイプ
+	 * @param type   商品タイプ
+	 * @param userId ユーザID
 	 * @return 注文一覧
 	 */
-	public List<Order> getAllFullOrderByType(String type) {
-		return orderRepository.findAllFullOrderByType(type);
+	public List<Order> getAllFullOrderByType(String type, int userId) {
+		return orderRepository.findAllFullOrderByType(type, userId);
 	}
 
 	/**
@@ -59,10 +60,10 @@ public class OrderService {
 		order.setOrderDate(new Date(new java.util.Date().getTime()));
 		// 配達希望日時をStringからTimestampへ変換
 		order.setDeliveryTime(orderForm.getTimeStampDeliveryTime());
-		
+
 		Order newOrder = orderRepository.insert(order);
 		System.out.println("newOrder:" + newOrder);
-		if(orderForm.getOrderItemFormList() == null) {
+		if (orderForm.getOrderItemFormList() == null) {
 			throw new RuntimeException("注文情報の中に注文商品一覧が存在しません");
 		}
 		for (OrderItemForm orderItemForm : orderForm.getOrderItemFormList()) {
@@ -73,10 +74,10 @@ public class OrderService {
 			OrderItem newOrderItem = orderItemRepository.insert(orderItem);
 
 			// トッピングがなければ次の商品の処理へ移る
-			if(orderItemForm.getOrderToppingFormList() == null) {
+			if (orderItemForm.getOrderToppingFormList() == null) {
 				continue;
 			}
-			
+
 			for (OrderToppingForm orderToppingForm : orderItemForm.getOrderToppingFormList()) {
 				OrderTopping orderTopping = new OrderTopping();
 				BeanUtils.copyProperties(orderToppingForm, orderTopping);
