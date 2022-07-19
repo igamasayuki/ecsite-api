@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jp.co.runy.domain.Item;
 import jp.co.runy.domain.Topping;
+import jp.co.runy.security.NonAuthorize;
 import jp.co.runy.service.ItemService;
 
 /**
@@ -39,7 +41,8 @@ public class ItemController {
 	 * @param type  商品タイプ (例：aloha=ハワイアン料理、pizza=ピザ)
 	 * @return 全件検索結果
 	 */
-	@RequestMapping(value = "/items/{type}", method = RequestMethod.GET)
+	@NonAuthorize //認可しない
+	@GetMapping("/items/{type}")
 	public Map<String, Object> items(@PathVariable("type") String type) {
 
 		List<Item> items = itemService.getItemList(type);
@@ -61,7 +64,8 @@ public class ItemController {
 	 * @param type  商品タイプ (例：aloha=ハワイアン料理、pizza=ピザ)
 	 * @return 全件検索結果
 	 */
-	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
+	@NonAuthorize //認可しない
+	@GetMapping("/{id}")
 	public Map<String, Object> toppings(@PathVariable("id") int id) {
 		
 		Item item = itemService.getItem(id);
@@ -88,7 +92,8 @@ public class ItemController {
 	 * @param type  商品タイプ (例：aloha=ハワイアン料理、pizza=ピザ)
 	 * @return 全件検索結果
 	 */
-	@RequestMapping(value = "/toppings/{type}", method = RequestMethod.GET)
+	@NonAuthorize //認可しない
+	@GetMapping("/toppings/{type}")
 	public Map<String, Object> toppings(@PathVariable("type") String type) {
 
 		List<Topping> toppings = itemService.getToppingList(type);

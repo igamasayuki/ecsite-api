@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jp.co.runy.common.WebApiResponseMessage;
 import jp.co.runy.domain.Order;
 import jp.co.runy.form.OrderForm;
+import jp.co.runy.security.Authorize;
 import jp.co.runy.service.OrderService;
 
 /**
@@ -43,7 +46,8 @@ public class OrderController {
 	 * 
 	 * @return 全件検索結果
 	 */
-	@RequestMapping(value = "/orders/{type}/{userId}", method = RequestMethod.GET)
+	@Authorize //認可する
+	@GetMapping("/orders/{type}/{userId}")
 	public Map<String, Object> orders(@PathVariable("type") String type, @PathVariable("userId") String userId) {
 
 		List<Order> orders = orderService.getAllFullOrderByType(type, Integer.parseInt(userId));
@@ -63,7 +67,8 @@ public class OrderController {
 	 * @param result    エラー処理に利用
 	 * @return レスポンスメッセージオブジェクト
 	 */
-	@RequestMapping(value = "", method = RequestMethod.POST)
+	@Authorize //認可する
+	@PostMapping("")
 	public WebApiResponseMessage order(@RequestBody @Validated OrderForm orderForm, BindingResult result) {
 		System.out.println("OrderForm:" + orderForm);
 

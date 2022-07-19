@@ -3,6 +3,7 @@ package jp.co.runy.controller;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.BeanUtils;
@@ -11,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -20,6 +22,9 @@ import jp.co.runy.common.WebApiResponseObject;
 import jp.co.runy.domain.User;
 import jp.co.runy.form.LoginForm;
 import jp.co.runy.form.RegisterUserForm;
+import jp.co.runy.security.Authorize;
+import jp.co.runy.security.JsonWebTokenUtil;
+import jp.co.runy.security.NonAuthorize;
 import jp.co.runy.service.LoginService;
 import jp.co.runy.service.RegisterUserService;
 
@@ -38,7 +43,7 @@ public class UserController {
 
 	@Autowired
 	private RegisterUserService service;
-	
+
 	@Autowired
 	private HttpSession session;
 
@@ -58,7 +63,8 @@ public class UserController {
 	 * @param result           入力値チェックのエラー群
 	 * @return レスポンスメッセージオブジェクト
 	 */
-	@RequestMapping(value = "", method = RequestMethod.POST)
+	@NonAuthorize // 認可しない
+	@PostMapping("")
 	public WebApiResponseObject registerUser(@RequestBody @Validated RegisterUserForm registerUserForm,
 			BindingResult result) {
 		System.out.println("RegisterUserForm：" + registerUserForm);
@@ -103,7 +109,6 @@ public class UserController {
 		System.out.println(webApiResponseObject);
 		return webApiResponseObject;
 	}
-	
 
 	/**
 	 * ログインをする.
@@ -112,15 +117,21 @@ public class UserController {
 	 * curl -X POST -H "Content-Type: application/json" -d '{"email":"test@gmail.com", "password":"TestTest123-"}' "http://localhost:8080/ecsite-api/user/login"
 	 * </pre>
 	 * 
+	 * @param form     フォーム
+	 * @param result   リザルト
+	 * @param model    モデル
+	 * @param response レスポンス情報
 	 * @return レスポンスメッセージオブジェクト
 	 */
-	@RequestMapping(value = "/login", method = RequestMethod.POST)
-	public WebApiResponseObject login(@RequestBody LoginForm form, BindingResult result, Model model) {
+	@NonAuthorize // 認可しない
+	@PostMapping("/login")
+	public WebApiResponseObject login(@RequestBody LoginForm form, BindingResult result, Model model,
+			HttpServletResponse response) {
 		System.out.println("form:" + form);
 		WebApiResponseObject webApiResponseObject = new WebApiResponseObject();
-		Map<String,Object> responseMap = new HashMap<>();
-		
-		if("admin@xxx.com".equals(form.getEmail()) && "adminadmin".equals(form.getPassword())) {
+		Map<String, Object> responseMap = new HashMap<>();
+
+		if ("admin@xxx.com".equals(form.getEmail()) && "adminadmin".equals(form.getPassword())) {
 			// 管理者ユーザーの情報なら管理者情報(isAdmin==trueの情報)を返す
 			User user = new User();
 			user.setId(999999999);
@@ -138,6 +149,9 @@ public class UserController {
 			responseMap.put("user", user);
 			webApiResponseObject.setResponseMap(responseMap);
 			System.out.println(webApiResponseObject);
+
+			// 認証トークンを発行してレスポンスに詰めます
+			createAndResponseAccessToken(user, response);
 			return webApiResponseObject;
 		}
 
@@ -150,7 +164,7 @@ public class UserController {
 			System.out.println("WebApiResponseMessage:" + webApiResponseObject);
 			return webApiResponseObject;
 		}
-		
+
 		user.setPassword("**********");
 		session.setAttribute("user", user);
 
@@ -161,6 +175,9 @@ public class UserController {
 		responseMap.put("user", user);
 		webApiResponseObject.setResponseMap(responseMap);
 		System.out.println(webApiResponseObject);
+
+		// 認証トークンを発行してレスポンスに詰めます
+		createAndResponseAccessToken(user, response);
 		return webApiResponseObject;
 	}
 
@@ -173,7 +190,8 @@ public class UserController {
 	 * 
 	 * @return WebAPIのレスポンス情報
 	 */
-	@RequestMapping(value = "/logout", method = RequestMethod.POST)
+	@Authorize // 認可する
+	@PostMapping("/logout")
 	public WebApiResponseObject logout() {
 		session.invalidate();
 		// 成功情報をレスポンス
@@ -183,5 +201,26 @@ public class UserController {
 		webApiResponseObject.setErrorCode("E-00");
 		System.out.println(webApiResponseObject);
 		return webApiResponseObject;
+	}
+
+	/*
+	 * 認証トークンを発行してレスポンスに詰めます.
+	 * 
+	 * @param user ログイン成功したユーザ情報
+	 * 
+	 * @param response レスポンス情報
+	 */
+	private void createAndResponseAccessToken(User user, HttpServletResponse response) {
+		// 認証トークン=JWT（JSON Web Token）を発行
+		JsonWebTokenUtil jsonWebTokenUtil = new JsonWebTokenUtil();
+		String jsonWebToken = jsonWebTokenUtil.generateToken(user.getId().toString());
+		System.out.println("jsonWebToken:" + jsonWebToken);
+
+//		response.addHeader(HEADER_STRING, TOKEN_PREFIX + jsonWebToken);
+		// CrossOrigin対応しているWebAPIでカスタムレスポンスヘッダを指定する場合、
+		// TypeScript側で取得するには以下の1行が必要
+		response.addHeader("Access-Control-Expose-Headers", "access-token");
+		// 認証トークン=JWT（JSON Web Token）を発行しレスポンスデータに含ませる
+		response.addHeader("access-token", jsonWebToken);
 	}
 }
