@@ -70,9 +70,9 @@ public class JsonWebTokenUtil {
 		// Authorizationの最初に付加されている「Bearer 」を除去し、アクセストークンのみ取り出し
 		String accessToken = authorization.substring(7);
 		System.out.println("accessToken : " + accessToken);
-		// トークンから管理者id(ログインした人のID)を取得
-		String administratorId = getIdFromToken(accessToken, SecurityConstants.JWT_KEY);
-		System.out.println("administratorId : " + administratorId);
+		// トークンからユーザーid(ログインした人のID)を取得
+		String userId = getIdFromToken(accessToken, SecurityConstants.JWT_KEY);
+		System.out.println("userId : " + userId);
 		return true;
 	}
 	
