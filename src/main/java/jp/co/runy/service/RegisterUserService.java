@@ -1,6 +1,7 @@
 package jp.co.runy.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +20,9 @@ public class RegisterUserService {
 
 	@Autowired
 	private UserRepository repository;
+	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
 	/**
 	 * メールアドレスが既にDBに存在しているかを調べる.
@@ -39,6 +43,11 @@ public class RegisterUserService {
 	 * @param user 登録したいユーザーのドメイン
 	 */
 	public void registerUser(User user) {
+		
+		// パスワードハッシュ化
+		String hashedPassword = passwordEncoder.encode(user.getPassword());
+		user.setPassword(hashedPassword);
+		
 		repository.insert(user);
 	}
 
