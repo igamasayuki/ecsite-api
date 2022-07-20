@@ -191,7 +191,7 @@ public class UserController {
 	 * @return WebAPIのレスポンス情報
 	 */
 	@Authorize // 認可する
-	@PostMapping("/logout")
+	@PostMapping("/signout")
 	public WebApiResponseObject logout() {
 		session.invalidate();
 		// 成功情報をレスポンス

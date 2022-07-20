@@ -25,15 +25,15 @@ public class JsonWebTokenUtil {
 	/**
 	 * 認証トークン=JWT（JSON Web Token）の生成.
 	 * 
-	 * @param id         ID
-	 * @param key        暗号化に使用するキー(サーバー側のみが知る情報でかつ複雑な物)
+	 * @param id  ID
+	 * @param key 暗号化に使用するキー(サーバー側のみが知る情報でかつ複雑な物)
 	 * @return 認証トークン=JWT（JSON Web Token）
 	 */
 	public String generateToken(String id) {
 		LocalDateTime localDateTime = LocalDateTime.now();
 		localDateTime = localDateTime.plusHours(SecurityConstants.EXPIRATION_HOUR); // 有効期限は8時間に設定
 		Date expirationDate = toDate(localDateTime); // 有効期限
-		
+
 		return Jwts.builder().setSubject(id).setExpiration(expirationDate)
 				.signWith(Keys.hmacShaKeyFor(SecurityConstants.JWT_KEY.getBytes(StandardCharsets.UTF_8))).compact();
 	}
@@ -43,7 +43,8 @@ public class JsonWebTokenUtil {
 	 * 
 	 * @param token 認証トークン=JWT（JSON Web Token）
 	 * @param key   暗号化に使用するキー(サーバー側のみが知る情報でかつ複雑な物)
-	 * @return ID
+	 * @return ID ID
+	 * @exception SignatureException ログイン時に発行されたトークン(署名)と違う場合に発生(非検査例外)
 	 */
 	public String getIdFromToken(String token, String key) {
 		return Jwts.parserBuilder().setSigningKey(Keys.hmacShaKeyFor(key.getBytes(StandardCharsets.UTF_8))).build()
@@ -66,24 +67,29 @@ public class JsonWebTokenUtil {
 		if (authorization.indexOf("Bearer ") != 0) {
 			return false;
 		}
-		
+
 		// Authorizationの最初に付加されている「Bearer 」を除去し、アクセストークンのみ取り出し
 		String accessToken = authorization.substring(7);
 		System.out.println("accessToken : " + accessToken);
 		// トークンからユーザーid(ログインした人のID)を取得
-		String userId = getIdFromToken(accessToken, SecurityConstants.JWT_KEY);
-		System.out.println("userId : " + userId);
+		try {
+			String userId = getIdFromToken(accessToken, SecurityConstants.JWT_KEY);
+			System.out.println("userId : " + userId);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
 		return true;
 	}
-	
-    /*
-     * LocalDateTimeからDateに変換.
-     */
-    private static Date toDate(LocalDateTime localDateTime) {
-        ZoneId zone = ZoneId.systemDefault();
-        ZonedDateTime zonedDateTime = ZonedDateTime.of(localDateTime, zone);
-        Instant instant = zonedDateTime.toInstant();
-        return Date.from(instant);
-    }
+
+	/*
+	 * LocalDateTimeからDateに変換.
+	 */
+	private static Date toDate(LocalDateTime localDateTime) {
+		ZoneId zone = ZoneId.systemDefault();
+		ZonedDateTime zonedDateTime = ZonedDateTime.of(localDateTime, zone);
+		Instant instant = zonedDateTime.toInstant();
+		return Date.from(instant);
+	}
 
 }
