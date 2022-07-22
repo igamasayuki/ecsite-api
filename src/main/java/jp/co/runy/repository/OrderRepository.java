@@ -210,8 +210,8 @@ public class OrderRepository {
 				+ " LEFT OUTER JOIN " + TABLE_ORDER_ITEMS_WITH_ALIAS + " ON o.id=oi.order_id " + "LEFT OUTER JOIN "
 				+ TABLE_ITEMS_WITH_ALIAS + " ON i.id=oi.item_id " + "LEFT OUTER JOIN " + TABLE_ORDER_TOPPINGS_WITH_ARIAS
 				+ "  ON oi.id=ot.order_item_id " + "LEFT OUTER JOIN " + TABLE_TOPPINGS_WITH_ARIAS
-				+ " ON t.id=ot.topping_id " + " WHERE i.type=:type and o.user_id=:userId;";
-//				+ " ORDER BY o.id,oi.id,ot.id;";
+				+ " ON t.id=ot.topping_id " + " WHERE i.type=:type and o.user_id=:userId"
+				+ " ORDER BY o.id DESC,oi.id,ot.id;";
 		System.out.println(sql);
 		System.out.println("type:" + type + "/userId:" + userId);
 		SqlParameterSource param = new MapSqlParameterSource().addValue("type", type).addValue("userId", userId);
