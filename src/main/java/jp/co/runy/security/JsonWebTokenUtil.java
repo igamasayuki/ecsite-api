@@ -26,7 +26,6 @@ public class JsonWebTokenUtil {
 	 * 認証トークン=JWT（JSON Web Token）の生成.
 	 * 
 	 * @param id  ID
-	 * @param key 暗号化に使用するキー(サーバー側のみが知る情報でかつ複雑な物)
 	 * @return 認証トークン=JWT（JSON Web Token）
 	 */
 	public String generateToken(String id) {
@@ -42,7 +41,6 @@ public class JsonWebTokenUtil {
 	 * 認証トークン=JWT（JSON Web Token）の解析しIDを返します.<br>
 	 * 
 	 * @param token 認証トークン=JWT（JSON Web Token）
-	 * @param key   暗号化に使用するキー(サーバー側のみが知る情報でかつ複雑な物)
 	 * @return ID ID
 	 * @exception SignatureException ログイン時に発行されたトークン(署名)と違う場合に発生(非検査例外)
 	 */
@@ -76,6 +74,7 @@ public class JsonWebTokenUtil {
 			String userId = getIdFromToken(accessToken, SecurityConstants.JWT_KEY);
 			System.out.println("userId : " + userId);
 		} catch (Exception e) {
+			// 有効期限切れや適当なトークンだった場合はRuntimeExceptionが発生するため、認可NGにする
 			e.printStackTrace();
 			return false;
 		}

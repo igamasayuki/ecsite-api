@@ -216,7 +216,6 @@ public class UserController {
 		String jsonWebToken = jsonWebTokenUtil.generateToken(user.getId().toString());
 		System.out.println("jsonWebToken:" + jsonWebToken);
 
-//		response.addHeader(HEADER_STRING, TOKEN_PREFIX + jsonWebToken);
 		// CrossOrigin対応しているWebAPIでカスタムレスポンスヘッダを指定する場合、
 		// TypeScript側で取得するには以下の1行が必要
 		response.addHeader("Access-Control-Expose-Headers", "access-token");

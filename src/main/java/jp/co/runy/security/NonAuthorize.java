@@ -17,7 +17,7 @@ import java.lang.annotation.Target;
  *
  */
 //@NonAuthorize
-@Target({ElementType.METHOD})
-@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.METHOD}) // メソッドにのみつけることができる
+@Retention(RetentionPolicy.RUNTIME) // 実行時に読み込まれる
 public @interface NonAuthorize {
 }

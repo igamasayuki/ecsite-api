@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
  *
  */
 //@Authorize
-@Target({ElementType.TYPE, ElementType.METHOD})
-@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE, ElementType.METHOD}) // クラスとメソッドにつけることができる
+@Retention(RetentionPolicy.RUNTIME)// 実行時に読み込まれる
 public @interface Authorize {
 }
