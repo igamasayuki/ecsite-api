@@ -5,12 +5,20 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Collections;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
+import jp.co.runy.domain.LoginUser;
+import jp.co.runy.repository.UserRepository;
 
 /**
  * JsonWetTokenでアクセス認証処理群をまとめたクラス.<br>
@@ -22,10 +30,13 @@ import io.jsonwebtoken.security.Keys;
  */
 public class JsonWebTokenUtil {
 
+	@Autowired
+	private UserRepository userRepository;
+
 	/**
 	 * 認証トークン=JWT（JSON Web Token）の生成.
 	 * 
-	 * @param id  ID
+	 * @param id ID
 	 * @return 認証トークン=JWT（JSON Web Token）
 	 */
 	public String generateToken(String id) {
@@ -73,6 +84,17 @@ public class JsonWebTokenUtil {
 		try {
 			String userId = getIdFromToken(accessToken, SecurityConstants.JWT_KEY);
 			System.out.println("userId : " + userId);
+
+			// SecurityContextにログインユーザー情報をセット
+			// これを行うことでコントローラーで以下のようにしてログイン者情報を受け取れる
+			// @RequestMapping("/xxx")
+			// public String xxx(Model model
+			//		, @AuthenticationPrincipal LoginUser loginUser) {
+			SecurityContext context = SecurityContextHolder.createEmptyContext();
+			LoginUser principal = new LoginUser(userRepository.load(Integer.parseInt(userId)), null);
+			context.setAuthentication(new JWTAuthenticationToken(Collections.emptyList(), principal));
+			SecurityContextHolder.setContext(context);
+
 		} catch (Exception e) {
 			// 有効期限切れや適当なトークンだった場合はRuntimeExceptionが発生するため、認可NGにする
 			e.printStackTrace();

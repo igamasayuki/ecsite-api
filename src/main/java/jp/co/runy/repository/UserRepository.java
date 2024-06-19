@@ -35,13 +35,26 @@ public class UserRepository {
 	 *
 	 * @param user 登録したいユーザーのドメイン
 	 */
-	synchronized public void insert(User user) {
+	public void insert(User user) {
 		SqlParameterSource param = new BeanPropertySqlParameterSource(user);
 		String sql = "INSERT INTO " + TABLE_USERS
 				+ " (name,email,password,zipcode,address,telephone) VALUES(:name,:email,:password,:zipcode,:address,:telephone);";
 		template.update(sql, param);
 	}
 
+	/**
+	 * 主キー検索をする.
+	 * 
+	 * @param id ID
+	 * @return ユーザー情報
+	 */
+	public User load(int id) {
+		String sql = "SELECT id,name,email,password,zipcode,address,telephone FROM " + TABLE_USERS
+				+ " WHERE id=:id;";
+		SqlParameterSource param = new MapSqlParameterSource().addValue("id", id);
+		return template.queryForObject(sql, param, USER_ROW_MAPPER);
+	}
+	
 	/**
 	 * メールアドレスとパスワードからユーザーを取得する.
 	 *
