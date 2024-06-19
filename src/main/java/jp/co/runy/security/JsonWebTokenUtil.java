@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContext;
@@ -32,6 +33,9 @@ public class JsonWebTokenUtil {
 
 	@Autowired
 	private UserRepository userRepository;
+	
+	@Autowired
+	private JwtBlacklistService jwtBlacklistService;
 
 	/**
 	 * 認証トークン=JWT（JSON Web Token）の生成.
@@ -66,7 +70,7 @@ public class JsonWebTokenUtil {
 	 * @param request リクエスト情報
 	 * @return 認可OK:true / 認可NG:false
 	 */
-	public boolean authorize(HttpServletRequest request) {
+	public boolean authorize(HttpServletRequest request, HttpServletResponse response) {
 		// Authorizationの値を取得
 		String authorization = request.getHeader("Authorization");
 		if (authorization == null || authorization.isEmpty()) {
@@ -78,10 +82,19 @@ public class JsonWebTokenUtil {
 		}
 
 		// Authorizationの最初に付加されている「Bearer 」を除去し、アクセストークンのみ取り出し
-		String accessToken = authorization.substring(7);
+        String accessToken = authorization.replace("Bearer ", "");
+//		String accessToken = authorization.substring(7);
 		System.out.println("accessToken : " + accessToken);
-		// トークンからユーザーid(ログインした人のID)を取得
+		
+		// ログアウトされているトークンだったら(JWTトークンがブラックリストに含まれていたら)、認可NGにする
+		if (jwtBlacklistService.isBlacklisted(accessToken)) {
+			// HTTPレスポンスのステータスコードを401 Unauthorizedに設定します
+		    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+		    return false;
+		}
+		
 		try {
+			// トークンからユーザーid(ログインした人のID)を取得
 			String userId = getIdFromToken(accessToken, SecurityConstants.JWT_KEY);
 			System.out.println("userId : " + userId);
 

@@ -1,8 +1,11 @@
 package jp.co.runy.controller;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
@@ -18,13 +21,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import jp.co.runy.common.WebApiResponseObject;
 import jp.co.runy.domain.User;
 import jp.co.runy.form.LoginForm;
 import jp.co.runy.form.RegisterUserForm;
 import jp.co.runy.security.Authorize;
 import jp.co.runy.security.JsonWebTokenUtil;
+import jp.co.runy.security.JwtBlacklistService;
 import jp.co.runy.security.NonAuthorize;
+import jp.co.runy.security.SecurityConstants;
 import jp.co.runy.service.LoginService;
 import jp.co.runy.service.RegisterUserService;
 
@@ -49,6 +57,9 @@ public class UserController {
 
 	@Autowired
 	private LoginService loginService;
+	
+	@Autowired
+	private JwtBlacklistService jwtBlacklistService;
 
 	/**
 	 * ユーザーの新規登録をする.
@@ -192,8 +203,24 @@ public class UserController {
 	 */
 	@Authorize // 認可する
 	@PostMapping("/signout")
-	public WebApiResponseObject logout() {
-		session.invalidate();
+	public WebApiResponseObject logout(HttpServletRequest request) {
+		// Authorizationの値を取得
+		String authorization = request.getHeader("Authorization");
+		
+		// JWTトークンを取得
+        String accessToken = authorization.replace("Bearer ", "");
+        
+        // トークンの有効期限を取得
+        Claims claims = Jwts.parserBuilder()
+            .setSigningKey(Keys.hmacShaKeyFor(SecurityConstants.JWT_KEY.getBytes(StandardCharsets.UTF_8)))
+            .build()
+            .parseClaimsJws(accessToken)
+            .getBody();
+        Date expirationDate = claims.getExpiration();
+        
+        // トークンをブラックリストに追加
+        jwtBlacklistService.addToBlacklist(accessToken, expirationDate);
+        
 		// 成功情報をレスポンス
 		WebApiResponseObject webApiResponseObject = new WebApiResponseObject();
 		webApiResponseObject.setStatus("success");
