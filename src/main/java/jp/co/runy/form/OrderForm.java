@@ -1,12 +1,14 @@
 package jp.co.runy.form;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
+
 
 /**
  * 注文時の各種情報を取得する際に使用するフォーム.

@@ -2,9 +2,8 @@ package jp.co.runy.security;
 
 import java.lang.reflect.Method;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.method.HandlerMethod;
@@ -20,6 +19,11 @@ import org.springframework.web.servlet.HandlerInterceptor;
  *
  */
 public class AuthorizationHandlerInterceptor implements HandlerInterceptor {
+
+//	@Override
+//	public boolean preHandle(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response, Object handler) throws Exception {
+//		return HandlerInterceptor.super.preHandle(request, response, handler);
+//	}
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {

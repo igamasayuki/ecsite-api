@@ -1,6 +1,7 @@
 package jp.co.runy.form;
 
-import javax.validation.constraints.NotBlank;
+
+import jakarta.validation.constraints.NotBlank;
 
 /**
  * ユーザー新規登録の際に利用されるフォーム.

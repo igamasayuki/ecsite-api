@@ -20,21 +20,19 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration // 設定用のクラス
 public class SecurityConfig implements WebMvcConfigurer {
 
-	/**
-	 * このメソッドをオーバーライドすることで、 特定のリクエストに対して「セキュリティ設定」を 無視する設定など全体にかかわる設定ができる.
-	 * 具体的には静的リソースに対してセキュリティの設定を無効にする。
-	 * 
-	 * @see org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter#configure(org.springframework.security.config.annotation.web.builders.WebSecurity)
-	 */
-	@Bean
-	public WebSecurityCustomizer webSecurityCustomizer() {
-		return (web) -> web.ignoring().antMatchers("/css/**", "/img/**", "/js/**", "/fonts/**");
-	}
+//	/**
+//	 * このメソッドをオーバーライドすることで、 特定のリクエストに対して「セキュリティ設定」を 無視する設定など全体にかかわる設定ができる.
+//	 * 具体的には静的リソースに対してセキュリティの設定を無効にする。
+//	 *
+//	 */
+//	@Bean
+//	public WebSecurityCustomizer webSecurityCustomizer() {
+//		return (web) -> web.ignoring().antMatchers("/css/**", "/img/**", "/js/**", "/fonts/**");
+//	}
 
 	/**
 	 * このメソッドをオーバーライドすることで、認可の設定やログイン/ログアウトに関する設定ができる.
 	 * 
-	 * @see org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter#configure(org.springframework.security.config.annotation.web.builders.HttpSecurity)
 	 */
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -45,8 +43,9 @@ public class SecurityConfig implements WebMvcConfigurer {
 ////			.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()); // cookieにCSRFトークンを入れる
 
 		// CSRFに関する設定 今回はJsonWebToken使用のためCSRFトークンを不要にする
-		http.csrf() 
-				.disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+//		http.csrf()
+//				.disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+		http.csrf(csrf -> csrf.disable());
 
 		return http.build();
 	}
