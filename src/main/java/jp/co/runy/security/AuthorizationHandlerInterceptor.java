@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.method.HandlerMethod;
@@ -20,10 +21,8 @@ import org.springframework.web.servlet.HandlerInterceptor;
  */
 public class AuthorizationHandlerInterceptor implements HandlerInterceptor {
 
-//	@Override
-//	public boolean preHandle(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response, Object handler) throws Exception {
-//		return HandlerInterceptor.super.preHandle(request, response, handler);
-//	}
+	@Autowired
+	private JsonWebTokenUtil jsonWebTokenUtil;
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
@@ -47,7 +46,6 @@ public class AuthorizationHandlerInterceptor implements HandlerInterceptor {
 		if (AnnotationUtils.findAnnotation(controller, Authorize.class) != null
 				|| AnnotationUtils.findAnnotation(method, Authorize.class) != null) {
 			// 付与されている場合は認可処理を実行
-			JsonWebTokenUtil jsonWebTokenUtil = new JsonWebTokenUtil();
 			boolean isAuthorizaOK = jsonWebTokenUtil.authorize(request, response);
 			System.out.println("認可する：" + isAuthorizaOK);
 

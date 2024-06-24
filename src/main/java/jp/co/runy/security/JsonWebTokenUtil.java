@@ -20,6 +20,7 @@ import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import jp.co.runy.domain.LoginUser;
 import jp.co.runy.repository.UserRepository;
+import org.springframework.stereotype.Component;
 
 /**
  * JsonWetTokenでアクセス認証処理群をまとめたクラス.<br>
@@ -29,6 +30,7 @@ import jp.co.runy.repository.UserRepository;
  * @author igamasayuki
  *
  */
+@Component
 public class JsonWebTokenUtil {
 
 	@Autowired
@@ -104,7 +106,7 @@ public class JsonWebTokenUtil {
 			// public String xxx(Model model
 			//		, @AuthenticationPrincipal LoginUser loginUser) {
 			SecurityContext context = SecurityContextHolder.createEmptyContext();
-			LoginUser principal = new LoginUser(userRepository.load(Integer.parseInt(userId)), null);
+			LoginUser principal = new LoginUser(userRepository.load(Integer.parseInt(userId)), Collections.emptyList());
 			context.setAuthentication(new JWTAuthenticationToken(Collections.emptyList(), principal));
 			SecurityContextHolder.setContext(context);
 
